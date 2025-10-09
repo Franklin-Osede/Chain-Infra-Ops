@@ -22,14 +22,14 @@ This repository contains a collection of **6 interconnected projects** that prog
 
 ## 🏗️ Project Portfolio
 
-| Project | Status | Focus Area | Key Technologies |
-|---------|--------|------------|-------------------|
-| **[NodeOps Full Infra](./01-nodeops-full-infra/)** | ✅ Complete | Infrastructure Foundation | Terraform, EKS, Helm, Prometheus |
-| **[Helm Chart Factory](./02-helm-chart-factory/)** | 🚧 In Progress | Chart Management | Helm, GitHub Pages, CI/CD |
-| **[Multi-Cloud Deployer](./03-multi-cloud-deployer/)** | 📋 Planned | Cloud Portability | Terraform, Packer, Multi-cloud |
-| **[Validator Cluster](./04-multichain-validator-cluster/)** | 📋 Planned | High Availability | K8s, StatefulSets, Biometric Auth |
-| **[Disaster Recovery](./05-blockchain-disaster-recovery/)** | 📋 Planned | Resilience | Failover, Backup, Identity Verification |
-| **[Identity Gateway](./06-identity-gateway/)** | 📋 Planned | Security & Auth | Biometric, QR, Blockchain Identity |
+| Project | Focus Area | Key Technologies |
+|---------|------------|-------------------|
+| **[NodeOps Full Infra](./01-nodeops-full-infra/)** | Infrastructure Foundation | Terraform, EKS, Helm, Prometheus |
+| **[Helm Chart Factory](./02-helm-chart-factory/)** | Chart Management | Helm, GitHub Pages, CI/CD |
+| **[Multi-Cloud Deployer](./03-multi-cloud-deployer/)** | Cloud Portability | Terraform, Packer, Multi-cloud |
+| **[Validator Cluster](./04-multichain-validator-cluster/)** | High Availability | K8s, StatefulSets, Biometric Auth |
+| **[Disaster Recovery](./05-blockchain-disaster-recovery/)** | Resilience | Failover, Backup, Identity Verification |
+| **[Identity Gateway](./06-identity-gateway/)** | Security & Auth | Biometric, QR, Blockchain Identity |
 
 ## 🚀 Quick Start
 
