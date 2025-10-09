@@ -1,0 +1,36 @@
+# Blockchain Node - ConfigMap
+# KISS Principle: Simple, clear, and maintainable
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "blockchain-node.fullname" . }}-config
+  labels:
+    {{- include "blockchain-node.labels" . | nindent 4 }}
+data:
+  # Blockchain node configuration
+  node-config.yaml: |
+    network:
+      id: {{ .Values.env.NETWORK_ID | default "1" }}
+      sync: {{ .Values.env.SYNC_MODE | default "fast" }}
+    cache:
+      size: {{ .Values.env.CACHE_SIZE | default "1024" }}
+    rpc:
+      port: {{ .Values.service.targetPort }}
+      host: "0.0.0.0"
+    {{- if .Values.env.ADDITIONAL_CONFIG }}
+    {{- toYaml .Values.env.ADDITIONAL_CONFIG | nindent 4 }}
+    {{- end }}
+  
+  # Health check script
+  health-check.sh: |
+    #!/bin/bash
+    set -e
+    
+    # Check if the blockchain node is responding
+    curl -f http://localhost:{{ .Values.service.targetPort }}/health || exit 1
+    
+    # Check if the node is synced
+    curl -f http://localhost:{{ .Values.service.targetPort }}/api/v1/sync || exit 1
+    
+    echo "Blockchain node is healthy"

@@ -1,0 +1,59 @@
+# Prometheus Alerts for Blockchain Nodes
+# KISS Principle: Simple, clear, and maintainable
+
+groups:
+  - name: blockchain-node-alerts
+    rules:
+      - alert: BlockchainNodeDown
+        expr: up{job="blockchain-node"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Blockchain node is down"
+          description: "Blockchain node {{ $labels.instance }} has been down for more than 1 minute."
+
+      - alert: BlockchainNodeHighCPU
+        expr: rate(container_cpu_usage_seconds_total{container="blockchain-node"}[5m]) > 0.8
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Blockchain node high CPU usage"
+          description: "Blockchain node {{ $labels.instance }} CPU usage is above 80% for more than 5 minutes."
+
+      - alert: BlockchainNodeHighMemory
+        expr: container_memory_usage_bytes{container="blockchain-node"} / container_spec_memory_limit_bytes{container="blockchain-node"} > 0.8
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Blockchain node high memory usage"
+          description: "Blockchain node {{ $labels.instance }} memory usage is above 80% for more than 5 minutes."
+
+      - alert: BlockchainNodeDiskSpace
+        expr: (container_fs_usage_bytes{container="blockchain-node"} / container_fs_limit_bytes{container="blockchain-node"}) > 0.9
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Blockchain node disk space critical"
+          description: "Blockchain node {{ $labels.instance }} disk usage is above 90% for more than 5 minutes."
+
+      - alert: BlockchainNodeSyncStatus
+        expr: blockchain_node_sync_status == 0
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Blockchain node sync issue"
+          description: "Blockchain node {{ $labels.instance }} is not synced for more than 2 minutes."
+
+      - alert: BlockchainNodeRPCErrors
+        expr: rate(blockchain_node_rpc_errors_total[5m]) > 0.1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Blockchain node RPC errors"
+          description: "Blockchain node {{ $labels.instance }} has high RPC error rate for more than 5 minutes."

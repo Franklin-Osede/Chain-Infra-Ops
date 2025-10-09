@@ -1,0 +1,66 @@
+# Dependencies
+node_modules/
+vendor/
+
+# Terraform
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+*.tfplan
+*.tfvars
+!*.tfvars.example
+
+# Kubernetes
+*.kubeconfig
+kubeconfig*
+
+# Helm
+charts/*.tgz
+.helm/
+
+# Logs
+*.log
+logs/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Secrets
+secrets/
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+
+# Build artifacts
+dist/
+build/
+target/
+
+# Coverage
+coverage/
+*.lcov
+
+# Runtime
+*.pid
+*.seed
+*.pid.lock

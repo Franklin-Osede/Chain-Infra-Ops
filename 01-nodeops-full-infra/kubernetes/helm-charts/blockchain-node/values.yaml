@@ -1,0 +1,124 @@
+# Blockchain Node - Values
+# KISS Principle: Simple, clear, and maintainable
+
+# Global Configuration
+global:
+  imageRegistry: "docker.io"
+  imagePullSecrets: []
+
+# Image Configuration
+image:
+  repository: "ethereum/client-go"
+  tag: "latest"
+  pullPolicy: IfNotPresent
+
+# Service Configuration
+service:
+  type: ClusterIP
+  port: 8545
+  targetPort: 8545
+
+# Ingress Configuration
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: blockchain-node.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+
+# Resource Configuration
+resources:
+  requests:
+    memory: "1Gi"
+    cpu: "500m"
+  limits:
+    memory: "2Gi"
+    cpu: "1000m"
+
+# Persistence Configuration
+persistence:
+  enabled: true
+  storageClass: ""
+  accessMode: ReadWriteOnce
+  size: 100Gi
+
+# Node Configuration
+node:
+  enabled: true
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
+# Security Context
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  fsGroup: 1000
+
+# Pod Configuration
+podAnnotations: {}
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  fsGroup: 1000
+
+# Environment Variables
+env:
+  - name: NETWORK_ID
+    value: "1"
+  - name: SYNC_MODE
+    value: "fast"
+  - name: CACHE_SIZE
+    value: "1024"
+
+# Health Checks
+livenessProbe:
+  httpGet:
+    path: /
+    port: 8545
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+readinessProbe:
+  httpGet:
+    path: /
+    port: 8545
+  initialDelaySeconds: 5
+  periodSeconds: 5
+  timeoutSeconds: 3
+  failureThreshold: 3
+
+# Autoscaling
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80
+
+# Replica Count
+replicaCount: 1
+
+# Service Account
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+# Pod Disruption Budget
+podDisruptionBudget:
+  enabled: false
+  minAvailable: 1
+  maxUnavailable: 1
+
+# Network Policy
+networkPolicy:
+  enabled: false
+  ingress: []
+  egress: []

@@ -1,0 +1,39 @@
+# NodeOps Monitoring Stack - Chart
+# KISS Principle: Simple, clear, and maintainable
+
+apiVersion: v2
+name: nodeops-monitoring
+description: A Helm chart for NodeOps monitoring stack
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+
+dependencies:
+  - name: prometheus
+    version: "25.8.0"
+    repository: "https://prometheus-community.github.io/helm-charts"
+    condition: prometheus.enabled
+  - name: grafana
+    version: "7.0.0"
+    repository: "https://grafana.github.io/helm-charts"
+    condition: grafana.enabled
+  - name: loki
+    version: "5.8.0"
+    repository: "https://grafana.github.io/helm-charts"
+    condition: loki.enabled
+  - name: alertmanager
+    version: "0.1.0"
+    repository: "https://prometheus-community.github.io/helm-charts"
+    condition: alertmanager.enabled
+
+maintainers:
+  - name: NodeOps Team
+    email: team@nodeops.io
+
+keywords:
+  - monitoring
+  - prometheus
+  - grafana
+  - loki
+  - blockchain
+  - nodeops

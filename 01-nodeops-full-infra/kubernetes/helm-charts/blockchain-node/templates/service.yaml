@@ -1,0 +1,18 @@
+# Blockchain Node - Service
+# KISS Principle: Simple, clear, and maintainable
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "blockchain-node.fullname" . }}
+  labels:
+    {{- include "blockchain-node.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: {{ .Values.service.targetPort }}
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "blockchain-node.selectorLabels" . | nindent 4 }}

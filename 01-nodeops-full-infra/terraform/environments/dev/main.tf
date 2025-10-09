@@ -1,0 +1,139 @@
+# NodeOps Full Infrastructure - Development Environment
+# KISS Principle: Simple, clear, and maintainable
+
+terraform {
+  required_version = ">= 1.0"
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+    kubernetes = {
+      source  = "hashicorp/kubernetes"
+      version = "~> 2.20"
+    }
+    helm = {
+      source  = "hashicorp/helm"
+      version = "~> 2.10"
+    }
+  }
+}
+
+# Configure AWS Provider
+provider "aws" {
+  region = var.aws_region
+}
+
+# Data sources - Must be defined before being used
+data "aws_availability_zones" "available" {
+  state = "available"
+}
+
+# VPC Module - Created first as dependency for EKS
+module "vpc" {
+  source  = "terraform-aws-modules/vpc/aws"
+  version = "~> 5.0"
+
+  name = "${var.project_name}-${var.environment}-vpc"
+  cidr = var.vpc_cidr
+
+  azs              = var.availability_zones
+  private_subnets  = var.private_subnet_cidrs
+  public_subnets   = var.public_subnet_cidrs
+  database_subnets = var.database_subnet_cidrs
+
+  enable_nat_gateway = true
+  enable_vpn_gateway = false
+
+  tags = var.tags
+}
+
+# EKS Cluster
+module "eks" {
+  source  = "terraform-aws-modules/eks/aws"
+  version = "~> 19.0"
+
+  cluster_name    = "${var.project_name}-${var.environment}"
+  cluster_version = var.kubernetes_version
+
+  vpc_id                         = module.vpc.vpc_id
+  subnet_ids                     = module.vpc.private_subnets
+  cluster_endpoint_public_access = true
+
+  # EKS Managed Node Groups
+  eks_managed_node_groups = {
+    main = {
+      name = "main"
+
+      instance_types = var.node_instance_types
+      capacity_type  = "ON_DEMAND"
+
+      min_size     = var.node_min_size
+      max_size     = var.node_max_size
+      desired_size = var.node_desired_size
+
+      disk_size = var.node_disk_size
+    }
+  }
+
+  tags = var.tags
+}
+
+# Data source for EKS authentication - Must be after EKS module
+data "aws_eks_cluster_auth" "cluster" {
+  name = module.eks.cluster_name
+}
+
+# Configure Kubernetes Provider - After EKS cluster is created
+provider "kubernetes" {
+  host                   = module.eks.cluster_endpoint
+  cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data)
+  token                  = data.aws_eks_cluster_auth.cluster.token
+}
+
+# Configure Helm Provider - After EKS cluster is created
+# Note: This provider configuration will be applied after EKS cluster creation
+# In practice, you would run kubectl config update first:
+# aws eks update-kubeconfig --region <region> --name <cluster-name>
+provider "helm" {
+  # Helm will use the default kubeconfig context
+  # Set via: aws eks update-kubeconfig --region var.aws_region --name module.eks.cluster_name
+}
+
+# Security Groups
+resource "aws_security_group" "nodeops" {
+  name_prefix = "${var.project_name}-nodeops-"
+  vpc_id      = module.vpc.vpc_id
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = merge(var.tags, {
+    Name = "${var.project_name}-nodeops-sg"
+  })
+}
